@@ -67,9 +67,25 @@ public class TestFibonacciHeap {
 	heap.extractMin();
 	heap.extractMin();
 	
+	assertEquals(2, heap.minRank());
 	assertEquals(2, heap.size());
-	assertEquals(3, heap.minKey());
+	assertEquals(1, heap.minKey());
     } 
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void TestNodeRankAfterExtractMin() {
+	heap.insert(0);
+	heap.insert(3);
+	heap.insert(5);
+	heap.insert(1);
+	heap.insert(1);
+	heap.extractMin();
+	heap.extractMin();
+	Node<Integer> node = heap.getMinNode();
+	assertEquals(2, heap.minRank());
+	assertEquals(1, (int)node.getKey());
+    }
     
     @SuppressWarnings("unchecked")
     @Test

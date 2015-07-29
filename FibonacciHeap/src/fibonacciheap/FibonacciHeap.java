@@ -1,7 +1,7 @@
 package fibonacciheap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FibonacciHeap<T extends Comparable<T>> {
 
@@ -29,6 +29,17 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	return minNode.key;
     }
 
+    public int minRank(){
+	if (isEmpty()) {
+	    return -1;  
+	}
+	return minNode.rank;
+    }
+
+    public Node<T> getMinNode(){
+	return minNode;
+    }
+
     public int size(){
 	return size;
     }
@@ -45,6 +56,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	if (isEmpty()) {
 	    return null;  
 	}
+
 	Node<T> min = minNode;
 	Node<T> extractedMin = min;
 	Node<T> newMin;
@@ -54,7 +66,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
 
 	    return extractedMin;
 
-	} else if (min != min.next && min.child == null) { // another root nodes are present, don't need consolidate
+	} else if (min != min.next && min.child == null) { 
 	    newMin = min.next;
 	    removeNode(min);
 	    minNode = findNewMin(newMin);
@@ -63,19 +75,22 @@ public class FibonacciHeap<T extends Comparable<T>> {
 
 	    return extractedMin;
 	}
+
 	Node<T> start = min.child; // need children's LinkedList
 	newMin = min;
 	if(min.child != null) { 
+
 	    do {
+		//removeNode(start);
 		newMin = unionRootsLists(newMin, start);
-		min.child.parent = null;
-		start = start.next;
+		start.parent = null;
+		//start = start.next;
 	    } while(min.child != start);
 	} 
 
 	min.child = null;
 	removeNode(min);
-	minNode = newMin;
+	minNode = findNewMin(newMin.next);
 	size--;
 	consolidate();
 
@@ -109,6 +124,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	Node<T> current = start.next;
 	do { 
 	    if(current.compareTo(newMin) < 0) {
+		newMin.isMinimum = false;
 		newMin = current;
 	    } 
 	    current = current.next;
@@ -174,22 +190,24 @@ public class FibonacciHeap<T extends Comparable<T>> {
     }
 
     private void consolidate() {
-	List<Node<T>> rankList = new ArrayList<Node<T>>();
+	Map<Integer, Node<T>> rankMap = new HashMap<Integer, Node<T>>();
 	Node<T> start = minNode;
 	Node<T> current = start;
 	Node<T> rankNode = null;
 	int index;
 	do { 
-	    current = current.next;
 	    index = current.rank;
-	    if (rankNode == null){
-		rankList.add(index, current);
-	    } else {
-		rankNode = rankList.get(index);
+	    if (rankMap.containsKey(index)){
+		rankNode = rankMap.get(index);
 		current = linkHeaps(current, rankNode);
-		rankList.add(current.rank, current);
-	    }
+		rankMap.remove(index);
+	    } else {
+		rankMap.put(index, current);
+		current = current.next;
+	    } 
+
 	} while (current != start);
+	
     }
 
     private Node<T> linkHeaps(Node<T> min, Node<T> max) {
@@ -207,7 +225,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	    union(min.child, max); 
 	}
 	max.isMarked = false;
-	max.parent = min;
+	if (max.rank != 0) {
+	    max.rank--;
+	}
 	min.rank++;
 	return min;
     }
@@ -216,7 +236,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
     implements Comparable<Node<T>> {
 
 	private T key;
-	private int rank;
+	int rank;
 	private Node<T> prev;
 	private Node<T> next;
 	private Node<T> parent;
