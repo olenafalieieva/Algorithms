@@ -76,12 +76,10 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	}
 	Node<T> start = min.child; // need children's LinkedList
 	newMin = min;
-	//if(min.child != null) { 
 	do {
 	    newMin = unionRootsLists(newMin, start);
 	    start.parent = null;
 	} while(min.child != start);
-	//} 
 	min.child = null;
 	newMin = min.next;
 	removeNode(min);
@@ -132,9 +130,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
     private void cut (Node<T> node, Node<T> parent) {
 	removeNode(node);
 	parent.rank--;
-	//parent.isMarked = true;
 	unionRootsLists(node, minNode);
-	//node.parent = null;
 	node.isMarked = false;
     }
 
@@ -206,7 +202,7 @@ public class FibonacciHeap<T extends Comparable<T>> {
     }
 
     private Node<T> linkHeaps(Node<T> min, Node<T> max) {
-	if (min.compareTo(max) > 0) {
+	if (min.compareTo(max) >= 0) {
 	    Node<T> temp = min;
 	    min = max;
 	    max = temp;
