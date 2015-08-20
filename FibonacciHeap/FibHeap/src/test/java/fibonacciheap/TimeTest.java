@@ -1,6 +1,6 @@
 package fibonacciheap;
 
-import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -36,26 +36,37 @@ public class TimeTest {
 	};
 
 	@Test
-	public void TestInsert() {
-		for (Integer i = 0; i < 3200; i++) {
-			heap.insert(i);
+	public void testInsert() {
+		System.out.println("Insert");
+		for (int j = 2; j <= Math.pow(2, 15); j*=2) {
+			insert(j);
+
+			System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
 		}
-		final long delta = 5;
-		//assertEquals(5L, stopwatch.runtime(TimeUnit.MILLISECONDS), delta);
-	}
+	} 
 
 	@Test
-	public void TestExtractMin() {
-		long total = 0;
-		for (Integer i = 0; i < 80; i++) {
-			heap.insert(i);
-			total++;
+	public void testExtractMin() {
+		System.out.println("Extracted Min");
+		for (int j = 2; j <= Math.pow(2, 15); j*=2) {
+			extractMin(j);
+
+			System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
 		}
-		for (long i = 0; i < total; i++) {
+	}
+	
+	private void insert(Integer j) {
+		for (Integer i = 0; i < j; i++) {
+			heap.insert(i);
+		}
+	}
+	
+	private void extractMin(long j) {
+		for (Integer i = 0; i < j; i++) {
+			heap.insert(i);
+		}
+		for (long i = 0; i < j; i++) {
 			heap.extractMin();
 		}
-		final long delta = 5;
-		//System.out.println(stopwatch.runtime(TimeUnit.MILLISECONDS));
-		//assertEquals(49L, stopwatch.runtime(TimeUnit.MILLISECONDS), delta);
 	}
 }

@@ -132,6 +132,7 @@ public class TestFibonacciHeap {
 		assertEquals(0, heap.minKey());
 	}  
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void TestDelete() {
 		heap.insert(3);
@@ -148,6 +149,7 @@ public class TestFibonacciHeap {
 		assertEquals(1, heap.minKey()); 
 	}  
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void TestTheSameNodes() {
 		heap.insert(3);

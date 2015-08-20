@@ -21,7 +21,7 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		return minNode;
 	}
 
-	public int getSize(){
+	public int getSize() {
 		return size;
 	}
 
@@ -34,16 +34,16 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		size = 0;
 	}
 
-	public E minKey(){
+	public E minKey() {
 		if (isEmpty()) {
-			return null;  
+			return null;
 		}
 		return minNode.key;
 	}
 
-	public int minRank(){
+	public int minRank() {
 		if (isEmpty()) {
-			return -1;  
+			return -1;
 		}
 		return minNode.rank;
 	}
@@ -58,41 +58,41 @@ public class FibonacciHeap<E extends Comparable<E>> {
 
 	public Node<E> extractMin() {
 		if (isEmpty()) {
-			return null;  
+			return null;
 		}
 		Node<E> min = minNode;
 		Node<E> extractedMin = minNode;
 		Node<E> newMin;
-		if(min == min.next && min.child == null) { 
+		if (min == min.next && min.child == null) {
 			size--; // should return size = 0
 			minNode = null;
 
 			return extractedMin;
 
-		} else if (min != min.next && min.child == null) { 
+		} else if (min != min.next && min.child == null) {
 			minNode = minNode.next;
 			removeNode(min);
-			consolidate(); 
+			consolidate();
 			size--;
 
 			return extractedMin;
 		}
 
-		Node<E> start = minNode.child; // need children's LinkedList
+		Node<E> startChild = minNode.child;
 		newMin = minNode.next;
-		minNode = minNode.next;
-		removeNode(min);
-
+		removeNode(minNode);
+		Node<E> start = startChild; // children's LinkedList is needed
 		NodeIterator<E> it = new NodeIterator<E>(start);
-		it.next();
-		while(it.hasNext()) {
-			unionRootsLists(newMin, start);
+		
+		do {
+			union(newMin, start);
 			start.parent = null;
-			newMin = start;
-			start = it.next();
-		} 
-		unionRootsLists(newMin, start);
-		start.parent = null;
+			if (it.next() != null) {
+				newMin = start;
+				start = it.next();
+			}
+		} while (it.hasNext());
+
 		minNode = newMin;
 		consolidate();
 		size--;
@@ -102,7 +102,8 @@ public class FibonacciHeap<E extends Comparable<E>> {
 
 	public void decreaseKey(Node<E> node, E newKey) {
 		if (newKey.compareTo(node.key) > 0) {
-			throw new IllegalArgumentException("New key is lager then current one");
+			throw new IllegalArgumentException(
+					"New key is lager then current one");
 		}
 		node.key = newKey;
 		Node<E> parentNode = node.parent;
@@ -124,14 +125,14 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		extractMin();
 	}
 
-	private void cut (Node<E> node, Node<E> parent) {
+	private void cut(Node<E> node, Node<E> parent) {
 		removeNode(node);
 		parent.rank--;
 		unionRootsLists(minNode, node);
 		node.isMarked = false;
 	}
 
-	private void cascadingCut (Node<E> parentNode) {
+	private void cascadingCut(Node<E> parentNode) {
 		Node<E> parent = parentNode.parent;
 		if (parent != null) {
 			if (!parentNode.isMarked) {
@@ -147,14 +148,14 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		if (min == null) {
 			return max;
 		}
-		if(max == null) {
+		if (max == null) {
 			return min;
 		}
 		union(min, max);
 
-		Node<E> minimNode; 
+		Node<E> minimNode;
 		if (min.compareTo(max) <= 0) {
-			minimNode = min;  
+			minimNode = min;
 		} else {
 			minimNode = max;
 			max.isMinimum = true;
@@ -172,49 +173,43 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		node = null;
 	}
 
-	 private void union(Node<E> min, Node<E> max) {
-			max.next = min;
-			max.prev = min.prev;
-			min.prev.next = max;
-			min.prev = max;
-		    }
+	private void union(Node<E> min, Node<E> max) {
+		if (min == null) {
+			return;
+		}
+		if (max == null) {
+			return;
+		}
+		max.next = min;
+		max.prev = min.prev;
+		min.prev.next = max;
+		min.prev = max;
+	}
 
 	private void consolidate() {
 		Node<E> start = minNode;
-		NodeIterator<E> iterator = new NodeIterator<E>(start);
-		Map<Integer, Node<E>> rankMap = new HashMap<Integer, Node<E>>();
-		Node<E> newMin = minNode;
 		Node<E> current = minNode;
 		Node<E> rankNode = null;
 		int index = current.rank;
-		iterator.next();
-		while (iterator.hasNext()) {
-			if (rankMap.containsKey(index)){
+		NodeIterator<E> it = new NodeIterator<E>(start);
+		Map<Integer, Node<E>> rankMap = new HashMap<Integer, Node<E>>();
+		do {
+			if (rankMap.containsKey(index)) {
 				rankNode = rankMap.get(index);
 				current = linkHeaps(current, rankNode);
 				rankMap.remove(index);
-				index = current.rank; 
-				if (current.compareTo(minNode) < 0) {
-					newMin = current;
-				}
+				index = current.rank;
 			} else {
 				rankMap.put(index, current);
-				current = iterator.next();
-				index = current.rank;
-				if (current.compareTo(minNode) < 0) {
-					newMin = current;
+				if (it.hasNext()) {
+					current = it.next();
 				}
-			} 
-		}
-		if (rankMap.containsKey(index)){
-			rankNode = rankMap.get(index);
-			rankNode = linkHeaps(current, rankNode);
-			rankMap.remove(index);
-			if (rankNode.compareTo(minNode) < 0) {
-				newMin = rankNode;
+				index = current.rank;
 			}
-		}
-		minNode = newMin;
+			if (current.compareTo(minNode) < 0) {
+				minNode = current;
+			}
+		} while (it.hasNext());
 	}
 
 	private Node<E> linkHeaps(Node<E> min, Node<E> max) {
@@ -228,7 +223,7 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		if (min.child == null) {
 			min.child = max;
 		} else {
-			union(max, min.child); 
+			union(max, min.child);
 		}
 		max.isMarked = false;
 		max.isMinimum = false;
@@ -237,8 +232,7 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		return min;
 	}
 
-	static class Node <E extends Comparable<E>> implements 
-	Comparable<Node<E>> {
+	static class Node<E extends Comparable<E>> implements Comparable<Node<E>> {
 
 		private E key;
 		int rank;
@@ -274,20 +268,21 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		}
 	}
 
-	private static class NodeIterator<E extends Comparable<E>>
-	implements Iterator<Node<E>> {
+	private static class NodeIterator<E extends Comparable<E>> implements
+	Iterator<Node<E>> {
 
 		private Queue<Node<E>> list = new LinkedList<Node<E>>();
 
-		public NodeIterator(Node<E> start) { 
+		public NodeIterator(Node<E> start) {
 			if (start == null) {
 				return;
 			}
 			Node<E> current = start;
-			do{ 
+			do {
 				list.add(current);
 				current = current.next;
 			} while (current != start);
+			this.next(); //sets pointer to head
 		}
 
 		public boolean hasNext() {
@@ -295,7 +290,7 @@ public class FibonacciHeap<E extends Comparable<E>> {
 		}
 
 		public Node<E> next() {
-			Node<E> node = list.poll(); 
+			Node<E> node = list.poll();
 			return node;
 		}
 
