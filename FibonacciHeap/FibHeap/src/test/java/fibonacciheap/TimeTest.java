@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 
+import fibonacciheap.FibonacciHeap.Node;
+
 public class TimeTest {
     private final FibonacciHeap<Integer> heap = new FibonacciHeap<Integer>();;
 
@@ -39,8 +41,7 @@ public class TimeTest {
     public void testInsert() {
 	System.out.println("Insert");
 	for (int j = 2; j <= Math.pow(2, 15); j*=2) {
-	    insert(j);
-
+	    insertTest(j);
 	    System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
 	}
     } 
@@ -49,19 +50,41 @@ public class TimeTest {
     public void testExtractMin() {
 	System.out.println("Extracted Min");
 	for (int j = 2; j <= Math.pow(2, 15); j*=2) {
-	    extractMin(j);
-
+	    extractMinTest(j);
 	    System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
 	}
     }
 
-    private void insert(Integer j) {
+    @Test
+    public void testDecreaseKey() {
+	System.out.println("Decrease Key");
+	for (int j = 2; j <= Math.pow(2, 15); j*=2) {
+	    Node<Integer> node = heap.insert(j+1);
+	    insertTest(j);
+	    heap.decreaseKey(node, 0);
+	    System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
+	}
+    }
+
+    @Test
+    public void testDelete() {
+	System.out.println("Delete");
+	for (int j = 2; j <= Math.pow(2, 15); j*=2) {
+	    insertTest(j);
+	    Node<Integer> node = heap.insert(j+1);
+	    heap.delete(node);
+	    System.out.println("N = "+j+" Time = "+ stopwatch.runtime(TimeUnit.MILLISECONDS));
+	}
+    }
+
+    
+    private void insertTest(Integer j) {
 	for (Integer i = 0; i < j; i++) {
 	    heap.insert(i);
 	}
     }
 
-    private void extractMin(long j) {
+    private void extractMinTest(long j) {
 	for (Integer i = 0; i < j; i++) {
 	    heap.insert(i);
 	}

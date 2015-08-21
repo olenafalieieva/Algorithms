@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class FibonacciHeap<E extends Comparable<E>> {
@@ -81,8 +80,8 @@ public class FibonacciHeap<E extends Comparable<E>> {
 	Node<E> startChild = minNode.child;
 	newMin = minNode.next;
 	removeNode(minNode);
-	Node<E> start = startChild; // children's LinkedList is needed
-	NodeIterator<E> it = new NodeIterator<E>(start);
+	Node<E> start = startChild; 
+	NodeIterator<E> it = new NodeIterator<E>(start); // do children's LinkedList for iterating
 
 	do {
 	    union(newMin, start);
@@ -104,6 +103,8 @@ public class FibonacciHeap<E extends Comparable<E>> {
 	if (newKey.compareTo(node.key) > 0) {
 	    throw new IllegalArgumentException(
 		    "New key is lager then current one");
+	} else if (newKey.compareTo(node.key) == 0) {
+	    return;
 	}
 	node.key = newKey;
 	Node<E> parentNode = node.parent;
