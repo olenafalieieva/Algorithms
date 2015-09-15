@@ -32,14 +32,9 @@ import fibonacciheap.FibonacciHeap.NodeIterator;
  */
 /**
  * public class FibNode {
-    int key;
-    int rank;
-    FibNode prev;
-    FibNode next;
-    FibNode parent;
-    FibNode child;
-    boolean isMarked;
-    boolean isMinimum;
+    int key, rank;
+    FibNode prev, next, parent, child;
+    boolean isMarked, isMinimum;
 
     public FibNode() {
 	this.key = 0;
@@ -146,8 +141,7 @@ public class FibHeapExtractMin {
     }
 }
 /**
- * public void removeNode(FibNode node) {
-
+  public void removeNode(FibNode node) {
 	node.next.prev = node.prev;
 	node.prev.next = node.next;
 	node.next = node;
@@ -175,15 +169,13 @@ public class FibHeapExtractMin {
     }
 
     private void union(FibNode max, FibNode min) {
-
 		max.next = min;
 		max.prev = min.prev;
 		min.prev.next = max;
 		min.prev = max;
-
-
+    	}
     }
-    }
+
     public static class NodeIterator implements
     Iterator<FibNode> {
 	private Queue<FibNode> list = new LinkedList<FibNode>();
@@ -197,7 +189,7 @@ public class FibHeapExtractMin {
 		list.add(current);
 		current = current.next;
 	    } while (current != start);
-	    this.next(); //sets pointer to head
+	   
 	}
 	public boolean hasNext() {
 	    return (!list.isEmpty());

@@ -168,16 +168,14 @@ public class FibonacciHeap {
 		list.add(current);
 		current = current.next;
 	    } while (current != start);
-	    this.next(); //sets pointer to head
 	}
 
 	public boolean hasNext() {
-	    return (!list.isEmpty());
+	    return  list.peek() != null;
 	}
 
 	public FibNode next() {
-	    FibNode node = list.poll();
-	    return node;
+	    return list.poll();
 	}
 
 	public void remove() {
@@ -185,7 +183,6 @@ public class FibonacciHeap {
 	}
     }
 
-    @Override
     public String toString() { 
 	StringBuilder sb = new StringBuilder();
 	if (minNode != null) {
