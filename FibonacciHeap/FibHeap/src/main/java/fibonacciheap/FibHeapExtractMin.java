@@ -2,6 +2,7 @@ package fibonacciheap;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import fibonacciheap.FibonacciHeap.NodeIterator;
 
 /**
@@ -87,16 +88,14 @@ public class FibHeapExtractMin {
 	FibNode newMin;
 	newMin = minNode.next;
 	heap.removeNode(minNode);
-	FibNode start = startChild; 
-	NodeIterator it = new NodeIterator(start); // do children's LinkedList for iterating
-	do {
-	    heap.union(newMin, start);
-	    start.parent = null;
-	    if (it.hasNext()) {
-		newMin = start;
-		start = it.next();
-	    }
-	} while (it.hasNext());
+
+	NodeIterator it = new NodeIterator(startChild); // do children's LinkedList for iterating
+	FibNode current = startChild;
+	while (it.hasNext()) {
+	    current = it.next();
+	    current.parent = null;
+	    heap.union(newMin, current);
+	} 
 	minNode = newMin;
 	consolidate(minNode, heap);
 	heap.size--;
@@ -111,12 +110,13 @@ public class FibHeapExtractMin {
 	    return;
 	}  
 	FibNode start = minNode;
-	FibNode current = minNode;
+	NodeIterator it = new NodeIterator(start);
+	FibNode current = it.next();
 	FibNode rankNode = null;
 	int index = current.rank;
-	NodeIterator it = new NodeIterator(start);
+
 	Map<Integer, FibNode> rankMap = new HashMap<Integer, FibNode>();
-	do {
+	while (it.hasNext()) {
 	    if (rankMap.containsKey(index)) {
 		rankNode = rankMap.get(index);
 		current = heap.linkHeaps(current, rankNode);
@@ -124,15 +124,13 @@ public class FibHeapExtractMin {
 		index = current.rank;
 	    } else {
 		rankMap.put(index, current);
-		if (it.hasNext()) {
-		    current = it.next();
-		}
+		current = it.next();
 		index = current.rank;
 	    }
 	    if (current.key < minNode.key) {
 		minNode = current;
 	    }
-	} while (it.hasNext());
+	} 
 
 	if (rankMap.containsKey(index)) {
 	    rankNode = rankMap.get(index);
@@ -148,7 +146,8 @@ public class FibHeapExtractMin {
     }
 }
 /**
- public void removeNode(FibNode node) {
+ * public void removeNode(FibNode node) {
+
 	node.next.prev = node.prev;
 	node.prev.next = node.next;
 	node.next = node;
@@ -175,6 +174,16 @@ public class FibHeapExtractMin {
 	return min;
     }
 
+    private void union(FibNode max, FibNode min) {
+
+		max.next = min;
+		max.prev = min.prev;
+		min.prev.next = max;
+		min.prev = max;
+
+
+    }
+    }
     public static class NodeIterator implements
     Iterator<FibNode> {
 	private Queue<FibNode> list = new LinkedList<FibNode>();
@@ -198,4 +207,4 @@ public class FibHeapExtractMin {
 	    return node;
 	}
     }
- **/
+ */
