@@ -90,6 +90,7 @@ public class FibHeapInsert {
     }
 
     private void union(FibNode min, FibNode max) {
+
 	max.next = min;
 	max.prev = min.prev;
 	min.prev.next = max;
