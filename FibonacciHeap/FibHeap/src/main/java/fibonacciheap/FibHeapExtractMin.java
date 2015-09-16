@@ -69,7 +69,21 @@ public class FibHeapExtractMin {
 
 	    return extractedMin;
 
-	} else if (minNode != minNode.next && minNode.child == null) {
+	} else if (minNode == minNode.next && minNode.child != null) {
+	    heap.size--; 
+	    FibNode tmpNode = minNode.child;
+	    heap.removeNode(minNode);
+	    minNode = tmpNode;
+	    if (minNode != minNode.next) {   
+		consolidate(minNode, heap);   
+	    }
+	    else {
+		heap.minNode = minNode;  
+	    }
+
+	    return extractedMin;
+	} 
+	else if (minNode != minNode.next && minNode.child == null) {
 	    FibNode min = minNode.next;
 	    heap.removeNode(minNode);
 	    minNode = min;
@@ -78,12 +92,10 @@ public class FibHeapExtractMin {
 
 	    return extractedMin;
 	}
-
 	FibNode startChild = minNode.child;
 	FibNode newMin;
 	newMin = minNode.next;
 	heap.removeNode(minNode);
-
 	NodeIterator it = new NodeIterator(startChild); // do children's LinkedList for iterating
 	FibNode current = startChild;
 	while (it.hasNext()) {
@@ -105,18 +117,19 @@ public class FibHeapExtractMin {
 	    return;
 	}  
 	FibNode start = minNode;
-	NodeIterator it = new NodeIterator(start);
+	NodeIterator it = new NodeIterator(minNode);
 	FibNode current = it.next();
 	FibNode rankNode = null;
 	int index = current.rank;
 
 	Map<Integer, FibNode> rankMap = new HashMap<Integer, FibNode>();
-	while (it.hasNext()) {
+	do {
 	    if (rankMap.containsKey(index)) {
 		rankNode = rankMap.get(index);
 		current = heap.linkHeaps(current, rankNode);
 		rankMap.remove(index);
 		index = current.rank;
+
 	    } else {
 		rankMap.put(index, current);
 		current = it.next();
@@ -125,18 +138,17 @@ public class FibHeapExtractMin {
 	    if (current.key < minNode.key) {
 		minNode = current;
 	    }
-	} 
+	} while (it.hasNext());
 
-	if (rankMap.containsKey(index)) {
+	while (rankMap.containsKey(index)) {
 	    rankNode = rankMap.get(index);
 	    current = heap.linkHeaps(current, rankNode);
 	    rankMap.remove(index);
 	    index = current.rank;
-	} 
-	if (current.key < minNode.key) {
-	    minNode = current;
+	    if (current.key < minNode.key) {
+		minNode = current;
+	    }
 	}
-
 	heap.minNode = minNode;	
     }
 }
@@ -146,7 +158,8 @@ public class FibHeapExtractMin {
 	node.prev.next = node.next;
 	node.next = node;
 	node.prev = node;
-	node = null;
+	node.child = null;
+	node.parent = null;
     }
 
     public FibNode linkHeaps(FibNode min, FibNode max) {
@@ -189,7 +202,7 @@ public class FibHeapExtractMin {
 		list.add(current);
 		current = current.next;
 	    } while (current != start);
-	   
+
 	}
 	public boolean hasNext() {
 	    return (!list.isEmpty());
